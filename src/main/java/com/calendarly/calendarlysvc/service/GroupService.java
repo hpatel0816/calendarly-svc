@@ -16,11 +16,11 @@ import com.calendarly.calendarlysvc.repository.GroupRepository;
 public class GroupService {
     
     private final GroupRepository groupRepository;
-    private final UserService userService;
+    private final AccountService accountService;
 
-    public GroupService(GroupRepository groupRepository, UserService userService) {
+    public GroupService(GroupRepository groupRepository, AccountService accountService) {
         this.groupRepository = groupRepository;
-        this.userService = userService;
+        this.accountService = accountService;
     }
 
 
@@ -44,7 +44,7 @@ public class GroupService {
     }
 
     public Set<GroupInfo> getAll(Integer userId) {
-        Set<Group> groups = userService.getUserById(userId).getGroups();
+        Set<Group> groups = accountService.getUserById(userId).getGroups();
         return groups.stream().map(Group::groupInfo).collect(Collectors.toSet());
     }
 
@@ -57,7 +57,7 @@ public class GroupService {
     }
 
     public Group createGroup(String groupName, Integer groupAdminId) {
-        User groupAdmin = userService.getUserById(groupAdminId);
+        User groupAdmin = accountService.getUserById(groupAdminId);
         Group newGroup = new Group(groupName, groupAdminId);
         newGroup.getUsers().add(groupAdmin);
         groupAdmin.getGroups().add(newGroup);
@@ -66,7 +66,7 @@ public class GroupService {
 
     public void addGroupMember(String groupCode, Integer userId) {
         Group group = getGroupByCode(groupCode);
-        User user = userService.getUserById(userId);
+        User user = accountService.getUserById(userId);
         group.getUsers().add(user);
         user.getGroups().add(group);
         groupRepository.save(group);

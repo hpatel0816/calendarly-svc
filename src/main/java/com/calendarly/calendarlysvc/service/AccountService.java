@@ -6,22 +6,22 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+public class AccountService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AccountService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found with the provided email."));
     }
 
     public User getUserById(Integer userId){
-        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found with the provided ID."));
     }
 
     public void saveUser(User user) { userRepository.save(user);}
@@ -35,6 +35,18 @@ public class UserService {
         String encryptedPassword = bCryptPasswordEncoder.encode(password);
         User user = new User(firstName, lastName, email, encryptedPassword);
         return userRepository.save(user);
+    }
+
+    public void changeEmail(String oldEmail, String newEmail) {
+        User user = getUserByEmail(oldEmail);
+        user.setEmail(newEmail);
+    }
+
+    public void changePassword(Integer userId, String oldPassword, String newPassword) {
+        User user = getUserById(userId);
+        if (user.getPassword().equals(oldPassword)) {
+            user.setPassword(newPassword);
+        }
     }
 
 }

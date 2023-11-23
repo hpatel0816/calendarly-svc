@@ -16,13 +16,13 @@ import com.calendarly.calendarlysvc.repository.EventRepository;
 public class EventService {
     
     private final EventRepository eventRepository;
-    private final UserService userService;
+    private final AccountService accountService;
     private final GroupService groupService;
     private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 
-    public EventService(EventRepository eventRepository, UserService userService, GroupService groupService) {
+    public EventService(EventRepository eventRepository, AccountService accountService, GroupService groupService) {
         this.eventRepository = eventRepository;
-        this.userService = userService;
+        this.accountService = accountService;
         this.groupService = groupService;
     }
 
@@ -36,7 +36,7 @@ public class EventService {
 
         logger.info("hit createEvent endpoint.");
         // Ensure the user and group exist *** This can be absracted away further like userExists && groupExists
-        User eventCreator = userService.getUserById(creatorId);
+        User eventCreator = accountService.getUserById(creatorId);
         logger.info("Retrieved user " + eventCreator);
         Group eventGroup = groupService.getGroupById(groupId);
         logger.info("Retrieved group " + eventGroup);
@@ -85,7 +85,7 @@ public class EventService {
     public void updateUserPreferenece(Long eventId, Integer userId, String preference) {
         Status newPreference = Status.valueOf(preference.toUpperCase());
         Event event = getEventById(eventId);
-        User user = userService.getUserById(userId);
+        User user = accountService.getUserById(userId);
         if (event.getUserPreferences().containsKey(user.getUserId())) {
             event.getUserPreferences().put(user.getUserId(), newPreference);
         } else {
